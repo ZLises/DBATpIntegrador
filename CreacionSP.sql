@@ -1,4 +1,4 @@
-USE FIGHT
+USE COM1353G05
 GO
 create procedure usar.InsertarCiudad(@nombreCiudad varchar(30))
 as

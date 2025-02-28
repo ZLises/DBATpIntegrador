@@ -1,21 +1,46 @@
+/*Luego de decidirse por un motor de base de datos relacional, llegó el momento de generar la 
+base de datos. En esta oportunidad utilizarán SQL Server. 
+Deberá instalar el DMBS y documentar el proceso. No incluya capturas de pantalla. Detalle 
+las configuraciones aplicadas (ubicación de archivos, memoria asignada, seguridad, puertos, 
+etc.) en un documento como el que le entregaría al DBA. 
+Incluya también un DER con el diseño de la base de datos. Deben aparecer correctamente 
+las relaciones y las claves, pero el formato queda a su criterio. 
+Cree la base de datos, entidades y relaciones. Incluya restricciones y claves. Deberá entregar 
+un archivo .sql con el script completo de creación (debe funcionar si se lo ejecuta “tal cual” es 
+entregado en una sola ejecución). Incluya comentarios para indicar qué hace cada módulo 
+de código.  
+Genere store procedures para manejar la inserción, modificado, borrado (si corresponde, 
+también debe decidir si determinadas entidades solo admitirán borrado lógico) de cada tabla. 
+Los nombres de los store procedures NO deben comenzar con “SP”.  
+Algunas operaciones implicarán store procedures que involucran varias tablas, uso de 
+transacciones, etc. Puede que incluso realicen ciertas operaciones mediante varios SPs. 
+Asegúrense de que los comentarios que acompañen al código lo expliquen. 
+Genere esquemas para organizar de forma lógica los componentes del sistema y aplique esto 
+en la creación de objetos. NO use el esquema “dbo”.  
+Todos los SP creados deben estar acompañados de juegos de prueba. Se espera que 
+realicen validaciones básicas en los SP (p/e cantidad mayor a cero, CUIT válido, etc.) y que 
+en los juegos de prueba demuestren la correcta aplicación de las validaciones. 
+Las pruebas deben realizarse en un script separado, donde con comentarios se indique en 
+cada caso el resultado esperado
+*/
 use master 
 go
 --creacion de la base de datos
 IF EXISTS(
 	select name from master.dbo.sysdatabases
-	where name = 'FIGHT'
+	where name = 'COM1353G05'
 )
  BEGIN
     print 'La base de datos ya existe'
  END
 ELSE
  BEGIN
-    CREATE DATABASE FIGHT
+    CREATE DATABASE [COM1353G05]
  END
 GO
 
 --usar la base de datos creada
-USE FIGHT
+USE COM1353G05
 GO
  
 --creacion del esquema principal
@@ -284,8 +309,6 @@ begin
   print 'La tabla productoImportado ya existe'
 end
 go
-
-
 
 --tablas que no tengo que juntar
 IF OBJECT_ID(N'obj.LineaProducto',N'U') IS NULL

@@ -1,4 +1,4 @@
-USE FIGHT
+USE COM1353G05
 GO
 --se espera que inserte la ciudad
 exec usar.InsertarCiudad 'San Justo'

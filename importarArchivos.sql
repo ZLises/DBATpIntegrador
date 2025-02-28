@@ -1,5 +1,30 @@
-USE FIGHT
+/*
+Se requiere que importe toda la información antes mencionada a la base de datos: 
+• Genere los objetos necesarios (store procedures, funciones, etc.) para importar los 
+archivos antes mencionados. Tenga en cuenta que cada mes se recibirán archivos de 
+novedades con la misma estructura, pero datos nuevos para agregar a cada maestro.  
+• Considere este comportamiento al generar el código. Debe admitir la importación de 
+novedades periódicamente sin eliminar los datos ya cargados y sin generar 
+duplicados. 
+• Cada maestro debe importarse con un SP distinto. No se aceptarán scripts que 
+realicen tareas por fuera de un SP. 
+Trabajo Práctico Integrador 
+Pág. 11 de 12 
+• La estructura/esquema de las tablas a generar será decisión suya. Puede que deba 
+realizar procesos de transformación sobre los maestros recibidos para adaptarlos a la 
+estructura requerida. Estas adaptaciones deberán hacerla en la DB y no en los 
+archivos provistos. 
+• Los archivos CSV/JSON no deben modificarse. En caso de que haya datos mal 
+cargados, incompletos, erróneos, etc., deberá contemplarlo y realizar las correcciones 
+en el fuente SQL. (Sería una excepción si el archivo está malformado y no es posible 
+interpretarlo como JSON o CSV, pero los hemos verificado cuidadosamente). 
+En esta entrega está incluida la generación de los informes en XML mencionados en la 
+introducción del TP. 
+*/
+
+USE COM1353G05
 GO
+
 create table #catalogoTemporal(
   id varchar(255),
   categoria varchar(255),
@@ -112,9 +137,6 @@ set fecha = REPLACE(fecha,'"','')
 where fecha like '%"%'
 go
 -----------------------
-select*from #catalogoTemporal
-where precio like '%i%'
-
 update #catalogoTemporal
 set nombre = nombre + ' ' + precio + ' ' + precioReferencia + ' ' + unidad
 where precio like '%i%'
@@ -192,7 +214,7 @@ go
 update #catalogoTemporal
 set unidad = SUBSTRING(fecha,1,charindex(',',fecha)-1) + '"'
 where unidad like '%albaricoque%'
-
+go
 
 update #catalogoTemporal
 set fecha = SUBSTRING(fecha,charindex(',',fecha)+1,len(fecha))
@@ -338,7 +360,7 @@ begin
 		)
 
 		bulk insert #tablaTemp
-		from 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Productos_importados(Listado de Productos).csv'
+		from '\BDATrabajoPractico\ArchivosImportar\Productos\Productos_importados(Listado de Productos).csv'
 		with(
 				 fieldterminator = ';',
 				 rowterminator = '\n',
@@ -362,3 +384,119 @@ begin
 end
 go
 -------- para poder importar en la tabla venta, se necesitan registros adicionales
+
+create table #tablaTemporal(
+     idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]') unique,
+	 tipoFactura char(1),
+	 ciudad varchar(50),
+	 tipoCliente varchar(30),
+	 genero varchar(20),
+	 producto varchar(100),
+	 precioUnitario decimal(6,2),
+	 cantidad int,
+	 fecha varchar(30),
+	 hora time,
+	 medioPago varchar(30),
+	 idEmpleado int,
+	 identificadorDePago char(23)
+)
+go
+bulk insert #tablaTemporal
+from 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'--ruta procedurencio valera
+with(
+		 fieldterminator = ';',
+		 rowterminator = '\n',
+		 codepage = 'ACP',
+		 firstrow= 2
+)
+go
+insert into obj.MedioPago(tipoPago)
+select medioPago from #tablaTemporal
+group by medioPago
+go
+
+insert into obj.TipoFactura
+select tipoFactura from #tablaTemporal
+group by tipoFactura
+having tipoFactura != 'A'
+go
+
+insert into obj.TipoCliente
+select tipoCliente from #tablaTemporal
+group by tipoCliente
+having tipoCliente != 'Normal'
+go
+
+create function importar.ModificarFecha(@fecha varchar(50))
+returns date
+as
+begin
+     declare @fecharetorno date
+     set @fecharetorno =  convert(date,@fecha,101)
+
+	 return @fecharetorno
+end
+go
+--
+create procedure importar.InsertarEmpleadosRandom(@cantidad int, @idEmpleado int,@cuil bigint)
+as
+begin
+   declare @calle varchar(30)
+   declare @numeroCalle int
+   declare @piso tinyint
+   declare @fecha datetime  
+   declare @nombre varchar(20)
+   declare @apellido varchar(20)
+   declare @auxcuil char(11)
+
+   while @cantidad > 0
+   begin
+   ----------------------------------------
+     set @calle = case cast(rand()*(5+1)-1 as int)   
+								when 1 then 'Chopin'
+								when 2 then 'Paz'
+								when 3 then 'Rivadavia'
+								else 'Alvarado'
+								end
+
+    set @numeroCalle = cast(rand()*(100-20)+20 as int) 
+
+	set @piso = cast(rand()*(5+1)-1 as tinyint)
+
+	set @fecha = getdate()
+
+	set @nombre = case cast(rand()*(5+1)-1 as int)   
+								when 1 then 'Julian'
+								when 2 then 'Enzo'
+								when 3 then 'Cuti'
+								else 'Alexis'
+								end
+	set @apellido = case cast(rand()*(5+1)-1 as int)   
+								when 1 then 'Alvarez'
+								when 2 then 'Fernandez'
+								when 3 then 'Romero'
+								else 'Mac Allister'
+								end
+	 set @auxcuil = cast(@cuil as char(11))
+------------------------------------------------
+     exec usar.InsertarEmpleado @idEmpleado,@calle,@numeroCalle,@piso,@fecha,@nombre,@apellido,2,@auxcuil
+	 
+	 set @cuil = @cuil - 100
+     set @idEmpleado = @idEmpleado + 1
+     set @cantidad = @cantidad - 1
+   end
+end
+go
+
+exec importar.InsertarEmpleadosRandom 7, 257020, 20137874563
+go
+
+---insertar los datos directamente a la tabla 
+insert into venta.Transacciones(idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad , fecha, hora , medioPago , idEmpleado , identificadorDePago)
+select idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad ,
+      importar.ModificarFecha(fecha),hora, medioPago ,idEmpleado ,identificadorDePago
+	  from #tablaTemporal
+go
+
+drop table #tablaTemporal
+go
