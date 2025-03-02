@@ -391,3 +391,44 @@ exec administracion.ImportarProductoImportado 'C:\Users\ulaza\Documents\SQL Serv
 
 select*from venta.CatalogoGeneral
 ----
+go
+create procedure administracion.ImportarLineaProducto(@ruta nvarchar(max))
+as
+begin
+       declare @duplicados nvarchar(max)
+	   set @duplicados = '	    with cte (producto,categoria,precio,duplicado)as
+								(
+								 select producto,lineaDeProducto,null, ROW_NUMBER()over(partition by producto,lineaDeProducto order by producto) as repe
+								 from #temporalTabla
+								)
+								delete from cte 
+								where duplicado > 1'
+
+       declare @bulkInsertar nvarchar(max)
+	   set @bulkInsertar =    'bulk insert #temporalTabla
+							from ''' + @ruta + '''
+							with(
+							   fieldterminator = '''+';'+''',
+							   rowterminator = '''+'\n'+''',
+							   codepage = ''' + 'ACP' + ''',
+							   firstrow = 2)'
+  
+	   create table #temporalTabla(
+			 lineaDeProducto varchar(255),
+			 producto varchar(255)
+	   )
+
+	   exec sp_executesql @bulkInsertar
+	   exec sp_executesql @duplicados
+		
+	   insert into venta.CatalogoGeneral(nombreProducto,categoriaProducto,precio)
+	   select producto, lineaDeProducto,null from #temporalTabla	   
+
+	   drop table #temporalTabla
+end
+go
+
+exec administracion.ImportarLineaProducto
+'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Informacion_complementaria(Clasificacion productos).csv'
+
+

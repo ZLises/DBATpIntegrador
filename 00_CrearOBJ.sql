@@ -108,28 +108,7 @@ ELSE
 GO
 
 
-IF OBJECT_ID(N'rrhh.Empleado',N'U') IS NULL
- BEGIN 
-   CREATE TABLE rrhh.Empleado(
-     idEmpleado int primary key,
-	 calle varchar(20),
-	 numeroCalle int,
-	 piso TINYINT default(0),
-	 fechaDeAlta datetime not null,
-	 nombre varchar(20),
-	 apellido varchar(20),
-	 idSucursal int,
-	 cuil char(11) check(cuil like '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]') unique,
-	 foreign key (idSucursal) references rrhh.Sucursal(idSucursal)
-   )
- END
-ELSE
- BEGIN
-   print 'La tabla empleado ya existe'
- END
-GO
-
-IF OBJECT_ID(N'rrhh.TipoCliente',N'U') IS NULL
+IF OBJECT_ID(N'venta.TipoCliente',N'U') IS NULL
  BEGIN 
   CREATE TABLE rrhh.TipoCliente(
     tipoCliente varchar(30) primary key
@@ -140,6 +119,8 @@ ELSE
    print 'Ya existe la tabla TipoCliente'
  END
 GO
+
+
 
 IF OBJECT_ID(N'venta.Cliente',N'U') IS NULL
  BEGIN 

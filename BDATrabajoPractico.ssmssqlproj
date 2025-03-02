@@ -28,11 +28,35 @@
           <AssociatedConnUserName />
           <FullPath>00_CrearOBJ.sql</FullPath>
         </FileNode>
-        <FileNode Name="02_Importaciones.sql">
+        <FileNode Name="01_CrearSP.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>02_Importaciones.sql</FullPath>
+          <FullPath>01_CrearSP.sql</FullPath>
+        </FileNode>
+        <FileNode Name="02._JuegosSP.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>02._JuegosSP.sql</FullPath>
+        </FileNode>
+        <FileNode Name="03_Importaciones.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>03_Importaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="04_JuegosImportaciones.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>04_JuegosImportaciones.sql</FullPath>
+        </FileNode>
+        <FileNode Name="05_DiseñoTransaccion.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>05_DiseñoTransaccion.sql</FullPath>
         </FileNode>
         <FileNode Name="CreacionObjetos.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
