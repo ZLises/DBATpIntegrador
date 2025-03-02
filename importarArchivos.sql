@@ -402,7 +402,7 @@ create table #tablaTemporal(
 )
 go
 bulk insert #tablaTemporal
-from 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'--ruta procedurencio valera
+from '\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'--ruta procedurencio valera
 with(
 		 fieldterminator = ';',
 		 rowterminator = '\n',

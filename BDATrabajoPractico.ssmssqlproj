@@ -22,6 +22,18 @@
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
+        <FileNode Name="00_CrearOBJ.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>00_CrearOBJ.sql</FullPath>
+        </FileNode>
+        <FileNode Name="02_Importaciones.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>02_Importaciones.sql</FullPath>
+        </FileNode>
         <FileNode Name="CreacionObjetos.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
