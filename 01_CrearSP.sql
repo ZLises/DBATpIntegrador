@@ -336,3 +336,33 @@ begin
    end
 end
 go
+---
+
+ALTER TABLE rrhh.Empleado
+add  Turno char(2) check(Turno like 'TM' or Turno like 'TT' or Turno like 'JC' )
+go
+create procedure rrhh.IngresarTurnoEmpleado(@idEmpleado int,@turno char(2))
+as
+begin
+    if(@turno like 'TT' or @turno like 'TM' or @turno like 'JC')
+	begin
+	    if exists(
+		        select idEmpleado from rrhh.Empleado
+				where idEmpleado = @idEmpleado
+		 )
+		 begin
+		        update rrhh.Empleado
+				set Turno = @turno
+				where idEmpleado = @idEmpleado
+		 end
+		 else
+		 begin
+		    print 'Empleado no encontrado o id erroneo'
+		 end
+	end
+	else
+	begin
+	   print 'Turno no valido'
+	end
+end
+go
