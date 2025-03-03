@@ -2,8 +2,6 @@ use AgainDB
 go
 
 /*
-
-
 create table #catalogoTemporal(
   id varchar(255),
   categoria varchar(255),
@@ -319,6 +317,8 @@ begin
 	  drop table #tablaTemporal
 end
 go
+
+
 /*
 exec administracion.ImportarAccesoriosElectronicos
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Electronic accessories.csv'
@@ -417,7 +417,8 @@ go
 exec administracion.ImportarLineaProducto
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Informacion_complementaria(Clasificacion productos).csv'
 */
-
+---pasos necesarios para importar en la tabla transacciones las ventas anteriores
+/*
 create table #tablaTemporal(
      idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]'),
 	 tipoFactura char(1),
@@ -444,8 +445,7 @@ with(
 		 firstrow= 2
 )
 go
-
-select*from venta.Transacciones
+*/
 
 create function administracion.ModificarFecha(@fecha varchar(50))
 returns date
