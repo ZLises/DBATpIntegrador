@@ -386,7 +386,7 @@ go
 -------- para poder importar en la tabla venta, se necesitan registros adicionales
 
 create table #tablaTemporal(
-     idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]') unique,
+     idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]'),
 	 tipoFactura char(1),
 	 ciudad varchar(50),
 	 tipoCliente varchar(30),
@@ -401,6 +401,7 @@ create table #tablaTemporal(
 	 identificadorDePago char(23)
 )
 go
+
 bulk insert #tablaTemporal
 from '\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'--ruta procedurencio valera
 with(
@@ -410,6 +411,7 @@ with(
 		 firstrow= 2
 )
 go
+
 insert into obj.MedioPago(tipoPago)
 select medioPago from #tablaTemporal
 group by medioPago

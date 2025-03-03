@@ -6,7 +6,7 @@ exec rrhh.InsertarCiudad 'San Justo'
 --se espera que no inserte la ciudad
 exec rrhh.InsertarCiudad 'San Justo'
 
-
+select*from rrhh.Ciudad
 --se espera que modifique la ciuadad
 exec rrhh.ModificarCiudad 'San Justo', 'Merlo'
 --se espera que no pueda modificar la ciudad
@@ -78,3 +78,9 @@ exec administracion.InsertarTipoFactura 'A'
 exec administracion.InsertarTipoFactura 'B'
 exec administracion.InsertarTipoFactura 'C'
 
+use AgainDB
+go
+
+select*from rrhh.Empleado
+select*from administracion.MedioPago
+select*from administracion.TipoFactura

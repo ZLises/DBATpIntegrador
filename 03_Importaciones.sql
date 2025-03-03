@@ -2,20 +2,7 @@ use AgainDB
 go
 
 /*
-IF OBJECT_ID(N'venta.CatalogoGeneral', N'U') IS NULL
-begin
-   CREATE TABLE venta.CatalogoGeneral(
-      idProducto int identity(1,1) primary key,
-	  nombreProducto varchar(200),
-	  categoriaProducto varchar(255),
-	  precio decimal(12,2)
-   )
-end
-else
-begin
-  print 'Ya existe la tabla catalogoGeneral'
-end
-*/
+
 
 create table #catalogoTemporal(
   id varchar(255),
@@ -250,7 +237,7 @@ set nombre = REPLACE(nombre,'+í','a')
 where nombre like '%+í%'
 go
 ---hasta aca se limpia toda la tabla
-
+*/
 --sp para importar catalogo a catalogoGeneral
 create procedure administracion.ImportarCatalogo(@ruta nvarchar(max))
 as
@@ -293,7 +280,7 @@ end
 go
 --sp para importar accesorios electronicos a catalogoGeneral
 
-create or alter procedure administracion.ImportarAccesoriosElectronicos(@ruta nvarchar(max))
+create procedure administracion.ImportarAccesoriosElectronicos(@ruta nvarchar(max))
 as
 begin
       declare @duplicados nvarchar(max)
@@ -332,12 +319,12 @@ begin
 	  drop table #tablaTemporal
 end
 go
-
+/*
 exec administracion.ImportarAccesoriosElectronicos
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Electronic accessories.csv'
-
+*/
 ----
-create or alter procedure administracion.ImportarProductoImportado(@ruta nvarchar(max))
+create procedure administracion.ImportarProductoImportado(@ruta nvarchar(max))
 as
 begin  
        declare @duplicados nvarchar(max)
@@ -386,10 +373,9 @@ begin
 		drop table #tablaTemp
 end
 go
-
+/*
 exec administracion.ImportarProductoImportado 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Productos_importados(Listado de Productos).csv'
-
-select*from venta.CatalogoGeneral
+*/
 ----
 go
 create procedure administracion.ImportarLineaProducto(@ruta nvarchar(max))
@@ -427,8 +413,113 @@ begin
 	   drop table #temporalTabla
 end
 go
-
+/*
 exec administracion.ImportarLineaProducto
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Informacion_complementaria(Clasificacion productos).csv'
+*/
+
+create table #tablaTemporal(
+     idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]'),
+	 tipoFactura char(1),
+	 ciudad varchar(50),
+	 tipoCliente varchar(30),
+	 genero varchar(20),
+	 producto varchar(100),
+	 precioUnitario decimal(6,2),
+	 cantidad int,
+	 fecha varchar(30),
+	 hora time,
+	 medioPago varchar(30),
+	 idEmpleado int,
+	 identificadorDePago char(23)
+)
+go
+
+bulk insert #tablaTemporal
+from 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
+with(
+		 fieldterminator = ';',
+		 rowterminator = '\n',
+		 codepage = 'ACP',
+		 firstrow= 2
+)
+go
+
+select*from venta.Transacciones
+
+create function administracion.ModificarFecha(@fecha varchar(50))
+returns date
+as
+begin
+     declare @fecharetorno date
+     set @fecharetorno =  convert(date,@fecha,101)
+
+	 return @fecharetorno
+end
+go
+/*
+insert into venta.Transacciones(idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad , fecha, hora , medioPago , idEmpleado , identificadorDePago)
+select idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad ,
+      administracion.ModificarFecha(fecha),hora, medioPago ,idEmpleado ,identificadorDePago
+	  from #tablaTemporal
+go
+*/
+
+go
+create or alter procedure venta.InsertarVenta(@ruta nvarchar(max))
+as
+begin
+     declare @repetidos nvarchar(max)
+	 set @repetidos = 'with repetidos(idFactura,duplicados) as 
+						(
+						  select idFactura, ROW_NUMBER() over (partition by idFactura order by precioUnitario desc) as repe
+						  from #tablaTemporal
+						)
+						delete from repetidos
+						where duplicados > 1'
 
 
+     declare @bulkInsertar nvarchar(max)
+	 set @bulkInsertar =    'bulk insert #tablaTemporal
+							from ''' + @ruta + '''
+							with(
+							   fieldterminator = '''+';'+''',
+							   rowterminator = '''+'\n'+''',
+							   codepage = ''' + 'ACP' + ''',
+							   firstrow = 2)'
+
+     create table #tablaTemporal(
+		 idFactura char(11) check(idFactura like '[0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9]'),
+		 tipoFactura char(1),
+		 ciudad varchar(50),
+		 tipoCliente varchar(30),
+		 genero varchar(20),
+		 producto varchar(100),
+		 precioUnitario decimal(6,2),
+		 cantidad int,
+		 fecha varchar(30),
+		 hora time,
+		 medioPago varchar(30),
+		 idEmpleado int,
+		 identificadorDePago char(23)
+     )
+
+	 exec sp_executesql @bulkInsertar
+	 exec sp_executesql @repetidos
+
+     insert into venta.Transacciones(idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad , fecha, hora , medioPago , idEmpleado , identificadorDePago)
+     select idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , precioUnitario , cantidad ,
+     administracion.ModificarFecha(fecha),hora, medioPago ,idEmpleado ,identificadorDePago
+	 from #tablaTemporal
+
+	 drop table #tablaTemporal
+end
+go
+
+select*from #tablaTemporal
+select*from venta.Transacciones
+
+exec venta.InsertarVenta 
+'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
+
+select*from venta.Transacciones
