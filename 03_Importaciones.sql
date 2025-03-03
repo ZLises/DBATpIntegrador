@@ -516,10 +516,9 @@ begin
 end
 go
 
-select*from #tablaTemporal
-select*from venta.Transacciones
-
+/*
 exec venta.InsertarVenta 
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
 
 select*from venta.Transacciones
+*/

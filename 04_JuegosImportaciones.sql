@@ -256,4 +256,8 @@ exec administracion.ImportarProductoImportado
 exec administracion.ImportarLineaProducto
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Informacion_complementaria(Clasificacion productos).csv'
 
+exec venta.InsertarVenta 
+'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
+
+
 select*from venta.CatalogoGeneral

@@ -198,6 +198,7 @@ GO
 IF OBJECT_ID(N'venta.Transacciones',N'U') IS NULL
  BEGIN 
    CREATE TABLE venta.Transacciones(
+     idTransaccion int identity(1,1) primary key,
      idFactura char(11),
 	 tipoFactura char(1),
 	 ciudad varchar(50),
