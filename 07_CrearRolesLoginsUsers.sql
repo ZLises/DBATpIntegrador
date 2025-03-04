@@ -1,39 +1,3 @@
-
-use AgainDB
-go
-
-create table venta.NotaDeCredito(
-   idNotaDeCredito int identity(1,1) primary key,
-   idFactura char(11),
-   montoTotal decimal(12,2),
-   fecha datetime not null
-)
-go
-create procedure venta.GenerarNotaDeCredito(@idFactura char(11))
-as
-begin
-   if exists(
-      select idFactura from venta.Transacciones
-	  where idFactura = @idFactura
-   )begin
-       declare @monto decimal(12,2)
-       set @monto = (select sum(cantidad*precioUnitario) as montoTotal from venta.Transacciones
-                    where idFactura = @idFactura)
-
-	   insert into venta.NotaDeCredito(idFactura,montoTotal,fecha)
-	   values (@idFactura,@monto,getdate())
-    end
-	else
-	begin
-	  print 'Ese id no se encuentra dentro de las transacciones'
-	end
-end
-go
----prueba de generar una nota de credito
-select * from venta.NotaDeCredito
-go
-exec venta.GenerarNotaDeCredito '415-45-2997'
-go
 ---------------
 use master
 go
@@ -59,44 +23,100 @@ with password = 'empleadoadministracion'
 use AgainDB
 go
 
-CREATE USER SupervisorRRHHUser
-CREATE USER SupervisorVentaUser
-CREATE USER SupervisorAdministracionUser
-CREATE USER EmpleadoRRHHUser
-CREATE USER EmpleadoVentaUser
-CREATE USER EmpleadoAdministracionUser
+CREATE USER SupervisorRRHHUser for login SupervisorRRHH
+go
+CREATE USER SupervisorVentaUser for login SupervisorVenta
+go
+CREATE USER SupervisorAdministracionUser for login SupervisorAdministracion
+go
+CREATE USER EmpleadoRRHHUser for login EmpleadoRRHH
+go
+CREATE USER EmpleadoVentaUser for login EmpleadoVenta
+go
+CREATE USER EmpleadoAdministracionUser for login EmpleadoAdiminstracion
+go
+----------------------------
 
 create role SupervisorRRHHRole
+go
 create role SupervisorVentaRole
+go
 create role SupervisorAdministracionRole
+go
 create role EmpleadoRRHHRole
+go
 create role EmpleadoVentaRole
+go
 create role EmpleadoAdministracionRole
-
+go
+----------------------------
 
 alter server role SupervisorRRHHRole add member SupervisorRRHHUser
+go
 alter server role SupervisorVentaRole add member SupervisorVentaUser
+go
 alter server role SupervisorAdministracionRole add member SupervisorAdministracionUser
+go
 alter server role EmpleadoRRHHRole add member EmpleadoRRHHUser
+go
 alter server role EmpleadoVentaRole add member EmpleadoVentaUser
+go
 alter server role EmpleadoAdministracionRole add member EmpleadoAdministracionUser
+go
 ----------------------------
 GRANT EXECUTE ON SCHEMA::rrhh to SupervisorRRHHRole
+go
+GRANT SELECT ON OBJECT::rrhh.Empleado to SupervisorRRHHRole;
+go
+GRANT SELECT ON OBJECT::rrhh.Sucursal to SupervisorRRHHRole;
+go
+GRANT SELECT ON OBJECT::rrhh.Ciudad to SupervisorRRHHRole;
+go
+GRANT SELECT ON OBJECT::rrhh.TelefonoEmpleado to SupervisorRRHHRole;
+go
+GRANT SELECT ON OBJECT::rrhh.TipoCliente to SupervisorRRHHRole;
+go
+
 
 GRANT EXECUTE ON SCHEMA::venta to SupervisorVentaRole
+go
+GRANT SELECT ON OBJECT::venta.Cliente to SupervisorVentaRole;
+go
+GRANT SELECT ON OBJECT::venta.TelefonoCliente to SupervisorVentaRole;
+go
+GRANT SELECT ON OBJECT::venta.CatalogoGeneral to SupervisorVentaRole;
+go
+GRANT SELECT ON OBJECT::venta.NotaDeCredito to SupervisorVentaRole;
+go
 
-GRANT EXECUTE ON SCHEMA::venta to SupervisorAdministracionRole
+GRANT EXECUTE ON SCHEMA::administracion to SupervisorAdministracionRole
+go
+GRANT SELECT ON OBJECT::administracion.MedioPago to SupervisorVentaRole;
+go
+GRANT SELECT ON OBJECT::administracion.TipoFactura to SupervisorVentaRole;
+go
 ----------------------------
 GRANT EXECUTE ON SCHEMA::rrhh to EmpleadoRRHHRole
+go
 DENY EXECUTE ON OBJECT :: rrhh.InsertarEmpleado to EmpleadoRRHHRole
+go
 DENY EXECUTE ON OBJECT :: rrhh.EliminarSucursal to EmpleadoRRHHRole
+go
 DENY EXECUTE ON OBJECT :: rrhh.EliminarEmpleado to EmpleadoRRHHRole
-DENY EXECUTE ON OBJECT :: rrhh.InsertarEmpleadoRandom to EmpleadoRRHHRole
-
+go
+DENY EXECUTE ON OBJECT :: rrhh.InsertarEmpleadosRandom to EmpleadoRRHHRole
+go
+----------------------------
 
 GRANT EXECUTE ON SCHEMA::venta to EmpleadoVentaRole
+go
 DENY EXECUTE ON OBJECT :: venta.GenerarNotaDeCredito to EmpleadoVentaRole
-
+go
+----------------------------
 GRANT EXECUTE ON SCHEMA::administracion to EmpleadoAdministracionRole
+go
 DENY EXECUTE ON OBJECT ::administracion.InsertarMedioPago to EmpleadoAdministracionRole
+go
 DENY EXECUTE ON OBJECT ::administracion.InsertarTipoFactura to EmpleadoAdministracionRole
+go
+----------------------------

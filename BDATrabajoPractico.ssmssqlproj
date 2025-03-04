@@ -70,6 +70,12 @@
           <AssociatedConnUserName />
           <FullPath>07_CrearRolesLoginsUsers.sql</FullPath>
         </FileNode>
+        <FileNode Name="08_EncriptarEmpleados.sql">
+          <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:DESKTOP-RUEH6RG:True</AssociatedConnectionMoniker>
+          <AssociatedConnSrvName>DESKTOP-RUEH6RG</AssociatedConnSrvName>
+          <AssociatedConnUserName />
+          <FullPath>08_EncriptarEmpleados.sql</FullPath>
+        </FileNode>
       </Items>
     </LogicalFolder>
     <LogicalFolder Name="Miscellaneous" Type="3" Sorted="true">

@@ -366,3 +366,25 @@ begin
 	end
 end
 go
+
+
+create procedure venta.GenerarNotaDeCredito(@idFactura char(11))
+as
+begin
+   if exists(
+      select idFactura from venta.Transacciones
+	  where idFactura = @idFactura
+   )begin
+       declare @monto decimal(12,2)
+       set @monto = (select sum(cantidad*precioUnitario) as montoTotal from venta.Transacciones
+                    where idFactura = @idFactura)
+
+	   insert into venta.NotaDeCredito(idFactura,montoTotal,fecha)
+	   values (@idFactura,@monto,getdate())
+    end
+	else
+	begin
+	  print 'Ese id no se encuentra dentro de las transacciones'
+	end
+end
+go

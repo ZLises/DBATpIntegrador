@@ -108,7 +108,7 @@ ELSE
 GO
 
 
-IF OBJECT_ID(N'venta.TipoCliente',N'U') IS NULL
+IF OBJECT_ID(N'rrhh.TipoCliente',N'U') IS NULL
  BEGIN 
   CREATE TABLE rrhh.TipoCliente(
     tipoCliente varchar(30) primary key
@@ -238,3 +238,18 @@ else
 begin
   print 'Ya existe la tabla catalogoGeneral'
 end
+
+IF OBJECT_ID(N'venta.NotaDeCredito',N'U') IS NULL
+begin
+		create table venta.NotaDeCredito(
+		   idNotaDeCredito int identity(1,1) primary key,
+		   idFactura char(11),
+		   montoTotal decimal(12,2),
+		   fecha datetime not null
+		)
+end
+else
+ begin
+ print 'Ya existe la tabla NotaDeCredito'
+ end
+go

@@ -84,3 +84,10 @@ go
 select*from rrhh.Empleado
 select*from administracion.MedioPago
 select*from administracion.TipoFactura
+
+
+---prueba de generar una nota de credito
+select * from venta.NotaDeCredito
+go
+exec venta.GenerarNotaDeCredito '415-45-2997'
+go
