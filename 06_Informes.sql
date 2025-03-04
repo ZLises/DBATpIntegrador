@@ -1,9 +1,5 @@
-use AgainDB
+use COM1353G05
 go
-/*
-Mensual: ingresando un mes y año determinado mostrar el total facturado por días de 
-la semana, incluyendo sábado y domingo.
-*/
 /*
 select*from venta.Transacciones
 
@@ -18,6 +14,11 @@ select '2025-03',* from asd
 pivot(sum(montoTotal) for dia in([Lunes],[Martes],[Miércoles],[Jueves],
 							[Viernes],[Sabado],[Domingo]))as h
 go
+*/
+
+/*
+Mensual: ingresando un mes y año determinado mostrar el total facturado por días de 
+la semana, incluyendo sábado y domingo.
 */
 create or alter procedure administracion.InformeMesual(@anio int, @mes int)
 as
@@ -52,32 +53,9 @@ go
 
 exec administracion.InformeMesual 2025,3
 go
-exec administracion.InformeMesual 2019,77
+exec administracion.InformeMesual 2019,2
 go
 ---------------------------------------------------------
-
---en empleado agregar los turnos TT,TM,JC
-/*
-select*from rrhh.Empleado
-
-ALTER TABLE rrhh.Empleado
-add  Turno char(2) check(Turno like 'TM' or Turno like 'TT' or Turno like 'JC' )
-
-update rrhh.Empleado
-set Turno = 'JC'
-
-update rrhh.Empleado
-set Turno = 'TT'
-where nombre like 'Alexis'
-
-update rrhh.Empleado
-set Turno = 'TM'
-where nombre like 'Julian'
-*/
-
-/*
-Trimestral: mostrar el total facturado por turnos de trabajo por mes. 
-*/
 /*
 with cte(Mes,Turno,monto) as(
 				select 1,Turno, (precioUnitario*cantidad) as mont from venta.Transacciones t
@@ -87,6 +65,10 @@ with cte(Mes,Turno,monto) as(
 			) 
 select*from cte
 pivot(sum(monto) for Turno in ([TM],[TT],[JC])) h
+*/
+
+/*
+Trimestral: mostrar el total facturado por turnos de trabajo por mes. 
 */
 
 create or alter procedure administracion.InformeTrimestral(@mes int)
@@ -115,13 +97,10 @@ begin
 	  end
 end
 go
-exec administracion.InformeTrimestral 3
 
+exec administracion.InformeTrimestral 3
+go
 ------------------
-/*
-Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar 
-la cantidad de productos vendidos en ese rango, ordenado de mayor a menor. 
-*/
 --agrupo por producto y cantidad 
 /*
 select producto, sum(cantidad) as cantidadVendida from venta.Transacciones
@@ -129,7 +108,12 @@ where fecha < '2019-03-30' and fecha > '2019-03-28'
 group by producto
 order by cantidadVendida desc
 */
-go
+
+/*
+Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar 
+la cantidad de productos vendidos en ese rango, ordenado de mayor a menor. 
+*/
+
 create or alter procedure administracion.InformePorRangoFechas(@fechaMax varchar(30),@fechaMin varchar(30))
 as
 begin
@@ -141,20 +125,10 @@ begin
 	FOR XML AUTO,ELEMENTS,ROOT('producto')
 end
 go
+
 exec administracion.InformePorRangoFechas '2019-03-30','2019-03-28'
 go
-/*
-Por rango de fechas: ingresando un rango de fechas a demanda, debe poder mostrar 
-la cantidad de productos vendidos en ese rango por sucursal, ordenado de mayor a 
-menor. 
-Mostrar los 5 productos más vendidos en un mes, por semana 
-Mostrar los 5 productos menos vendidos en el mes. 
-Mostrar total acumulado de ventas (o sea también mostrar el detalle) para una fecha 
-y sucursal particulares 
-*/
---crear el nuevo informe de ventas y ponerlo en una vista para luego reutilizar la vista en 
---estos enunciados
-
+---------------
 /*
 select idFactura as IDFactura,tipoFactura as TipoFactura,ciudad as Ciudad
        ,tipoCliente as TipoCliente ,genero as Genero,
@@ -171,6 +145,7 @@ select idFactura as IDFactura,tipoFactura as TipoFactura,ciudad as Ciudad
 
 go
 */
+----vista para los reportes futuros que se encuentra en el tp
 create view administracion.ReporteVentas
 as
 select idFactura as IDFactura,tipoFactura as TipoFactura,ciudad as Ciudad
@@ -187,8 +162,8 @@ select idFactura as IDFactura,tipoFactura as TipoFactura,ciudad as Ciudad
 	   on s.idSucursal = e.idSucursal
 go
 
---Mostrar los 5 productos más vendidos en un mes, por semana 
-
+select*from administracion.ReporteVentas
+---------------------------
 /*
 select * from(
     select Producto, sum(cantidad) as Cantidad, datepart(week,fecha)as semana,
@@ -200,6 +175,10 @@ select * from(
 where orden < 6
 
 go
+*/
+
+/*
+Mostrar los 5 productos menos vendidos en el mes por semana. 
 */
 create or alter procedure administracion.ProductosMasVendidosEnUnMesPorSemana(@mes int)
 as
@@ -226,8 +205,7 @@ end
 go
 exec administracion.ProductosMasVendidosEnUnMesPorSemana 3
 go
- /* Mostrar los 5 productos menos vendidos en el mes. */
-
+----------------------------
  /*
  select*from(
 	 select  Producto, sum(cantidad) as CantidadVendidas,
@@ -237,6 +215,7 @@ go
 	 group by Producto)g
 	 where Rango < 6
  */
+/* Mostrar los 5 productos menos vendidos en el mes. */
 create or alter procedure administracion.ReporteTop5ProductosMenosVendidosMes(@mes int)
 as
 begin  
@@ -261,14 +240,20 @@ begin
 	end
 end
 go
-exec administracion.ReporteTop5ProductosMenosVendidosMes 2
 
+exec administracion.ReporteTop5ProductosMenosVendidosMes 2
+go
 /*
 select Sucursal,sum(Cantidad*Precio) as total from administracion.ReporteVentas
 where Sucursal = 'Ramos Mejia' and MONTH(Fecha) = 3
 group by Sucursal
 */
-go
+
+/*
+Mostrar total acumulado de ventas (o sea también mostrar el detalle) para una fecha 
+y sucursal particulares 
+*/
+
 create procedure administracion.ReporteSucursalMesTotal(@sucursal varchar(30),@mes int)
 as
 begin
@@ -295,12 +280,9 @@ begin
 end
 go
 
-exec administracion.ReporteSucursalMesTotal 'Ramos Mejia',1
+exec administracion.ReporteSucursalMesTotal 'Merlo', 1
 go
 --
-/*
-Mensual: ingresando un mes y año determinado mostrar el vendedor de mayor monto 
-facturado por sucursal. */
 /*
 select*from(
 	select IDEmpleado,sum(Cantidad*Precio)as monto,
@@ -311,7 +293,12 @@ select*from(
 )as a
 where Posicion = 1
 */
-go
+
+
+/*
+Mensual: ingresando un mes y año determinado mostrar el vendedor de mayor monto 
+facturado por sucursal.
+*/
 create or alter procedure administracion.InformeVendedorMayorMontoMesAnio(@anio int,@mes int)
 as
 begin
@@ -337,4 +324,5 @@ begin
 
 end
 go
+
 exec administracion.InformeVendedorMayorMontoMesAnio 2019,3

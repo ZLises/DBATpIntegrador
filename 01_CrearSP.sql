@@ -1,6 +1,10 @@
-use AgainDB
+use COM1353G05
 go
-
+--primero se modifica la tabla empleado para poder seguir con los procedimientos
+ALTER TABLE rrhh.Empleado
+  add  Turno char(2) check(Turno like 'TM' or Turno like 'TT' or Turno like 'JC' )
+go
+--procedure que inserta ciudades
 create procedure rrhh.InsertarCiudad(@nombreCiudad varchar(30))
 as
 begin
@@ -17,7 +21,7 @@ else
  end
 end
 go
-
+--procedimiento para modificar ciudades almacenadas
 create procedure rrhh.ModificarCiudad(@nombreCiudad varchar(30), @nuevoNombreCiudad varchar(30))
 as
 begin
@@ -36,7 +40,7 @@ begin
    end
 end
 go
-
+--procedimiento para eliminar ciudades almacenadas
 create procedure rrhh.EliminarCiudad(@nombreCiudadEliminar varchar(30))
 as
 begin
@@ -54,7 +58,7 @@ begin
     end
 end
 go
-
+--procedimiento para ingresar sucursales a partir de ciudades almacenadas
 create procedure rrhh.IngresarSucursal(@nombreCiudad varchar(30))
 as
 begin
@@ -81,7 +85,7 @@ begin
    end
 end
 go
-
+--procedimiento para eliminar sucursales
 create procedure rrhh.EliminarSucursal(@ciudadSucursalEliminar varchar(30))
 as
 begin
@@ -99,10 +103,10 @@ begin
   end
 end
 go
-
-create procedure rrhh.InsertarEmpleado(@idEmpleado int,@calle varchar(20),@numeroCalle int,
+--procedimiento para insertar empleados
+create or alter procedure rrhh.InsertarEmpleado(@idEmpleado int,@calle varchar(20),@numeroCalle int,
                                        @fechaDeAlta datetime, @nombre varchar(20),@apellido varchar(20),
-									   @idSucursal int, @cuil char(11))
+									   @idSucursal int, @cuil char(11),@turno char(2))
 as
 begin
      if exists(
@@ -113,23 +117,30 @@ begin
 	  end
 	  else
 	  begin
-	      if exists(
-		     select cuil from rrhh.Empleado
-			 where cuil = @cuil
-		   )begin
-		     print 'Ya existe ese cuil dentro de la tabla empleados'
-		    end
-			else
-			begin
-			   insert into rrhh.Empleado(idEmpleado,calle,numeroCalle,fechaDeAlta,
-									     nombre,apellido,idSucursal,cuil)
-										 values(@idEmpleado,@calle,@numeroCalle,@fechaDeAlta,
-									     @nombre,@apellido,@idSucursal,@cuil)
-			end
+	      if((@turno like 'TM' or @turno like 'TT' or @turno like 'JC' ))
+		  begin
+				  if exists(
+					 select cuil from rrhh.Empleado
+					 where cuil = @cuil
+				   )begin
+					 print 'Ya existe ese cuil dentro de la tabla empleados'
+					end
+					else
+					begin
+					   insert into rrhh.Empleado(idEmpleado,calle,numeroCalle,fechaDeAlta,
+												 nombre,apellido,idSucursal,cuil,Turno)
+												 values(@idEmpleado,@calle,@numeroCalle,@fechaDeAlta,
+												 @nombre,@apellido,@idSucursal,@cuil,@turno)
+					end
+		  end
+		  else
+		  begin
+		     print 'Ese turno no existe'
+		  end
       end
 end
 go
-
+--procedimiento para eliminar empleados
 create procedure rrhh.EliminarEmpleado(@idEmpleado int)
 as
 begin
@@ -147,7 +158,7 @@ begin
    end
 end
 go
-
+--procedure para insertar los distintos tipos de cliente
 create procedure rrhh.InsertarTipoCliente(@tipo varchar(30))
 as
 begin
@@ -164,6 +175,7 @@ begin
    end
 end
 go
+--procedure para insertar nuevos clientes
 create procedure venta.InsertarCliente
 (   @idCliente int ,
 	@calle varchar(20),
@@ -199,7 +211,7 @@ begin
    end
 end
 GO
-
+--procedure para eliminar cliente
 create procedure venta.EliminarCliente(@idCliente int)
 as
 begin
@@ -217,7 +229,7 @@ begin
    end
 end
 go
-
+--procedure para insertar telefonos a los empleados
 create procedure rrhh.InsertarTelefonoEmpleado(@idEmpleado int, @telefono int)
 as
 begin
@@ -235,7 +247,7 @@ begin
    end
 end
 go
-
+--procedure para insertar telefonos a los cliente
 create procedure venta.InsertarTelefonoCliente(@idCliente int, @telefono int)
 as
 begin
@@ -253,7 +265,7 @@ begin
    end
 end
 go
-
+--procedure para insertar distintos medios de pago
 create procedure administracion.InsertarMedioPago(@medioPago varchar(30))
 as
 begin 
@@ -270,7 +282,7 @@ begin
 	end
 end
 go
-
+--procedure para insertar tipos de factura
 create procedure administracion.InsertarTipoFactura(@tipo char(1))
 as
 begin
@@ -289,7 +301,7 @@ begin
 end
 go
 
-----------------------------
+---procedure para ingresar empleados random, solo debe ser usado para pruebas
 create or alter procedure rrhh.InsertarEmpleadosRandom(@cantidad int, @idEmpleado int,@cuil bigint,@idSucursal int)
 as
 begin
@@ -299,75 +311,53 @@ begin
    declare @nombre varchar(20)
    declare @apellido varchar(20)
    declare @auxcuil char(11)
+   declare @turno char(2)
 
    while @cantidad > 0
    begin
-   ----------------------------------------
-     set @calle = case cast(rand()*(5+1)-1 as int)   
-								when 1 then 'Chopin'
-								when 2 then 'Paz'
-								when 3 then 'Rivadavia'
-								else 'Alvarado'
-								end
+	   ----------------------------------------
+		 set @calle = case cast(rand()*(5+1)-1 as int)   
+									when 1 then 'Chopin'
+									when 2 then 'Paz'
+									when 3 then 'Rivadavia'
+									else 'Alvarado'
+									end
 
-    set @numeroCalle = cast(rand()*(100-20)+20 as int) 
+		set @numeroCalle = cast(rand()*(100-20)+20 as int) 
 
-	set @fecha = getdate()
+		set @fecha = getdate()
 
-	set @nombre = case cast(rand()*(5+1)-1 as int)   
-								when 1 then 'Julian'
-								when 2 then 'Enzo'
-								when 3 then 'Cuti'
-								else 'Alexis'
-								end
-	set @apellido = case cast(rand()*(5+1)-1 as int)   
-								when 1 then 'Alvarez'
-								when 2 then 'Fernandez'
-								when 3 then 'Romero'
-								else 'Mac Allister'
-								end
-	 set @auxcuil = cast(@cuil as char(11))
-
-     exec rrhh.InsertarEmpleado @idEmpleado,@calle,@numeroCalle,@fecha,@nombre,@apellido,@idSucursal,@auxcuil
+		set @nombre = case cast(rand()*(5-1)+1 as int)   
+									when 1 then 'Julian'
+									when 2 then 'Enzo'
+									when 3 then 'Cuti'
+									else 'Alexis'
+									end
+		set @apellido = case cast(rand()*(5-1)+1 as int)   
+									when 1 then 'Alvarez'
+									when 2 then 'Fernandez'
+									when 3 then 'Romero'
+									else 'Mac Allister'
+									end
 	 
-	 set @cuil = @cuil - 100
-     set @idEmpleado = @idEmpleado + 1
-     set @cantidad = @cantidad - 1
+		 set @turno = case cast(rand()*(3-1)+1 as int)
+					  when 1 then 'TT'
+					  when 2 then 'TM'
+					  else 'JC'
+					  end
+
+		 set @auxcuil = cast(@cuil as char(11))
+
+		 exec rrhh.InsertarEmpleado @idEmpleado,@calle,@numeroCalle,@fecha,@nombre,@apellido,@idSucursal,@auxcuil,@turno;
+	 
+		 set @cuil = @cuil - 100
+		 set @idEmpleado = @idEmpleado + 1
+		 set @cantidad = @cantidad - 1
+		 ----
    end
 end
 go
----
-
-ALTER TABLE rrhh.Empleado
-add  Turno char(2) check(Turno like 'TM' or Turno like 'TT' or Turno like 'JC' )
-go
-create procedure rrhh.IngresarTurnoEmpleado(@idEmpleado int,@turno char(2))
-as
-begin
-    if(@turno like 'TT' or @turno like 'TM' or @turno like 'JC')
-	begin
-	    if exists(
-		        select idEmpleado from rrhh.Empleado
-				where idEmpleado = @idEmpleado
-		 )
-		 begin
-		        update rrhh.Empleado
-				set Turno = @turno
-				where idEmpleado = @idEmpleado
-		 end
-		 else
-		 begin
-		    print 'Empleado no encontrado o id erroneo'
-		 end
-	end
-	else
-	begin
-	   print 'Turno no valido'
-	end
-end
-go
-
-
+--procedimiento para generar nota de credito de parte de un supervisor del area de ventas
 create procedure venta.GenerarNotaDeCredito(@idFactura char(11))
 as
 begin

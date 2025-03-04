@@ -1,4 +1,4 @@
-use AgainDB
+use COM1353G05
 go
 
 select*from rrhh.Empleado
@@ -45,3 +45,5 @@ set nombre = ''
 
 update rrhh.Empleado
 set apellido = ''
+
+select*from rrhh.Empleado

@@ -1,8 +1,12 @@
-use AgainDB
+use COM1353G05
 go
 
 select*from venta.Transacciones
 
+/*
+  Para poder realizar las transacciones es necesario crear la tabla #InsertarProducto
+  que es la encargada de almacenar los productos que van a tener una unica factura
+*/
 create table #InsertarProducto(
    idProducto int,
    cantidad int
@@ -148,17 +152,19 @@ begin
 end
 go
 
---format(campo,'HH:mm')
 --pequeño juego de transacciones
-
 select*from venta.CatalogoGeneral
 where idProducto = 67
---Insersion de productos correctamente 
+--Insersion de productos correctamente, 2 Mermeladas de fresa en este caso
 exec venta.InsertarProducto 67,2
 go
---confirmo la venta
+
+--confirmo la venta y a lo ultimo deberia de estar el id 67 y cantidad 2
+--en ConfirmarTransaccion se ingresa el id del cliente, medio de pago y el idEmpleado
 exec venta.ConfirmarTransaccion 221,'Cash',6789
 go
+
+select*from venta.Transacciones
 
 --ingreso muchos productos
 exec venta.InsertarProducto 41, 12
@@ -178,3 +184,10 @@ select*from venta.CatalogoGeneral
 select*from venta.Cliente
 select*from rrhh.Empleado
 select*from venta.Transacciones
+
+---prueba de generar una nota de credito
+select * from venta.NotaDeCredito
+go
+--el id para generar la nota de credito debe de existir
+exec venta.GenerarNotaDeCredito '415-45-2997'
+go

@@ -1,247 +1,35 @@
-use AgainDB
-go
-
 /*
-create table #catalogoTemporal(
-  id varchar(255),
-  categoria varchar(255),
-  nombre varchar(255),
-  precio varchar(255),
-  precioReferencia varchar(255),
-  unidad  varchar(255),
-  fecha varchar(255)
-)
-go
-
-BULK Insert #catalogoTemporal
-from 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\catalogo.csv'
-with(
-   fieldterminator = ',',
-   rowterminator = '\n',
-   firstrow = 2
-)
-go
-------------------------------------
-
-update #catalogoTemporal
-set nombre = nombre +' '+ precio+' ' + precioReferencia 
-where precioReferencia like '%"%'
-go
-
-update #catalogoTemporal
-set precio = unidad
-where precioReferencia like '%"%'
-go
-
-update #catalogoTemporal
-set precioReferencia = substring(fecha,1,CHARINDEX(',',fecha)) + 'x'
-where precioReferencia like '%"%'
-go
-
-update #catalogoTemporal
-set precioReferencia = REPLACE(precioReferencia,',','')
-where precioReferencia like '%x%'
-go
-
-update #catalogoTemporal
-set fecha = substring(fecha,CHARINDEX(',',fecha)+1, len(fecha))
-where precioReferencia like '%x%'
-go
-
-update #catalogoTemporal
-set unidad = SUBSTRING(fecha,1,CHARINDEX(',',fecha))
-where precioReferencia like '%x%'
-go
-
-update #catalogoTemporal
-set unidad = REPLACE(unidad,',','')
-where unidad like '%,%'
-go
-
-update #catalogoTemporal
-set fecha = substring(fecha,CHARINDEX(',',fecha)+1, len(fecha))
-where precioReferencia like '%x%'
-go--
-
-update #catalogoTemporal
-set fecha = REPLACE(fecha,'"','')
-where precioReferencia like '%x%'
-go--
-
-update #catalogoTemporal
-set precioReferencia = REPLACE(precioReferencia,'x','')
-where precioReferencia like '%x%'
-go
----------------------
-
---elimina comillas de los ids
-update #catalogoTemporal
-set id = REPLACE(id,'"','')
-where id like '%"%'
-go
-------------------
-update #catalogoTemporal
-set nombre = nombre + ' ' + precio 
-where precio like '%"%'
-go--
-
-update #catalogoTemporal
-set precio = precioReferencia + 'x'
-where precio like '%"%'
-go--
-
-update #catalogoTemporal
-set precioReferencia = unidad 
-where precio like '%x%'
-go
-
-update #catalogoTemporal
-set unidad = SUBSTRING(fecha,1,CHARINDEX(',',fecha)-1)
-where precio like '%x%'
-go--
-
-update #catalogoTemporal
-set fecha = substring(fecha,CHARINDEX(',',fecha)+1, len(fecha))
-where precio like '%x%'
-go--
-
-update #catalogoTemporal
-set precio = REPLACE(precio,'x','')
-where precio like '%x%'
-go--
-
-update #catalogoTemporal
-set fecha = REPLACE(fecha,'"','')
-where fecha like '%"%'
-go
------------------------
-update #catalogoTemporal
-set nombre = nombre + ' ' + precio + ' ' + precioReferencia + ' ' + unidad
-where precio like '%i%'
-go--
-
-update #catalogoTemporal
-set precio = SUBSTRING(fecha,1,CHARINDEX(',',fecha)-1)
-where precio like '%i%'
-go--
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,CHARINDEX(',',fecha)+1,len(fecha))
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set precioReferencia = SUBSTRING(fecha,1,CHARINDEX(',',fecha)-1)
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set unidad = SUBSTRING(fecha,1,charindex(',',fecha)-1) + '"'
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,CHARINDEX(',',fecha)+1,len(fecha))
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set unidad = SUBSTRING(fecha,1,charindex(',',fecha)-1) + '"'
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,CHARINDEX(',',fecha)+1,len(fecha))
-where unidad like '%"%'
-go--
-
-update #catalogoTemporal
-set unidad = REPLACE(unidad,'"','')
-where unidad like '%"%'
-go--
----------------------------------------
-
-update #catalogoTemporal
-set nombre = nombre + ' ' + precio + ' ' + precioReferencia + ' ' + unidad + SUBSTRING(fecha,1,charindex(',',fecha)-1)
-where unidad like '%albaricoque%'
-go--
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,charindex(',',fecha)+1,len(fecha))
-where unidad like '%albaricoque%'
-go
-
-update #catalogoTemporal
-set precio = SUBSTRING(fecha,1,charindex(',',fecha)-1)
-where unidad like '%albaricoque%'
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,charindex(',',fecha)+1,len(fecha))
-where unidad like '%albaricoque%'
-go
-
-update #catalogoTemporal
-set precioReferencia = SUBSTRING(fecha,1,charindex(',',fecha)-1) 
-where unidad like '%albaricoque%'
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,charindex(',',fecha)+1,len(fecha))
-where unidad like '%albaricoque%'
-go
-
-update #catalogoTemporal
-set unidad = SUBSTRING(fecha,1,charindex(',',fecha)-1) + '"'
-where unidad like '%albaricoque%'
-go
-
-update #catalogoTemporal
-set fecha = SUBSTRING(fecha,charindex(',',fecha)+1,len(fecha))
-where unidad like '%"%'
-go
-
-update #catalogoTemporal
-set unidad = REPLACE(unidad,'"','')
-where unidad like '%"%'
-go--
-------------------------------------
---sacar comillas de los nombres
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'"','')
-where nombre like '%"%'
-go
---e
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'+®','e')
-where nombre like '%+®%'
-go
---o
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'+¦','o')
-where nombre like '%+¦%'
-go
---i
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'+¡','i')
-where nombre like '%+¡%'
-go
---u
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'++','u')
-where nombre like '%++%'
-go
---a
-update #catalogoTemporal
-set nombre = REPLACE(nombre,'+í','a')
-where nombre like '%+í%'
-go
----hasta aca se limpia toda la tabla
+Se requiere que importe toda la información antes mencionada a la base de datos: 
+• Genere los objetos necesarios (store procedures, funciones, etc.) para importar los 
+archivos antes mencionados. Tenga en cuenta que cada mes se recibirán archivos de 
+novedades con la misma estructura, pero datos nuevos para agregar a cada maestro.  
+• Considere este comportamiento al generar el código. Debe admitir la importación de 
+novedades periódicamente sin eliminar los datos ya cargados y sin generar 
+duplicados. 
+• Cada maestro debe importarse con un SP distinto. No se aceptarán scripts que 
+realicen tareas por fuera de un SP. 
+• La estructura/esquema de las tablas a generar será decisión suya. Puede que deba 
+realizar procesos de transformación sobre los maestros recibidos para adaptarlos a la 
+estructura requerida. Estas adaptaciones deberán hacerla en la DB y no en los 
+archivos provistos. 
+• Los archivos CSV/JSON no deben modificarse. En caso de que haya datos mal 
+cargados, incompletos, erróneos, etc., deberá contemplarlo y realizar las correcciones 
+en el fuente SQL. (Sería una excepción si el archivo está malformado y no es posible 
+interpretarlo como JSON o CSV, pero los hemos verificado cuidadosamente). 
+En esta entrega está incluida la generación de los informes en XML mencionados en la 
+introducción del TP. 
 */
+
+
+use ADBPRUEBA
+go
+
 --sp para importar catalogo a catalogoGeneral
 create procedure administracion.ImportarCatalogo(@ruta nvarchar(max))
 as
 begin 
     declare @bulkInsertar nvarchar(max)
-	set @bulkInsertar =    'bulk insert #temporal
+	set @bulkInsertar =    'bulk insert #catalogoTemporal
 							from ''' + @ruta + '''
 							with(
 							   fieldterminator = '''+','+''',
@@ -318,12 +106,11 @@ begin
 end
 go
 
-
 /*
 exec administracion.ImportarAccesoriosElectronicos
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Electronic accessories.csv'
 */
-----
+------Sp para importar productos importados
 create procedure administracion.ImportarProductoImportado(@ruta nvarchar(max))
 as
 begin  
@@ -377,7 +164,6 @@ go
 exec administracion.ImportarProductoImportado 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Productos_importados(Listado de Productos).csv'
 */
 ----
-go
 create procedure administracion.ImportarLineaProducto(@ruta nvarchar(max))
 as
 begin
@@ -465,7 +251,6 @@ select idFactura, tipoFactura , ciudad , tipoCliente , genero , producto , preci
 go
 */
 
-go
 create or alter procedure venta.InsertarVenta(@ruta nvarchar(max))
 as
 begin

@@ -1,4 +1,19 @@
----------------
+/*
+Cuando un cliente reclama la devolución de un producto se genera una nota de crédito por el 
+valor del producto o un producto del mismo tipo. 
+En el caso de que el cliente solicite la nota de crédito, solo los Supervisores tienen el permiso 
+para generarla.  
+Tener en cuenta que la nota de crédito debe estar asociada a una Factura con estado pagada. 
+Asigne los roles correspondientes para poder cumplir con este requisito. 
+Por otra parte, se requiere que los datos de los empleados se encuentren encriptados, dado 
+que los mismos contienen información personal. 
+La información de las ventas es de vital importancia para el negocio, por ello se requiere que 
+se establezcan políticas de respaldo tanto en las ventas diarias generadas como en los 
+reportes generados.  
+Plantee una política de respaldo adecuada para cumplir con este requisito y justifique la 
+misma. No es necesario que incluya el código de creación de los respaldos. 
+
+*/
 use master
 go
 
@@ -20,7 +35,7 @@ with password = 'superradministracion'
 CREATE LOGIN EmpleadoAdiminstracion 
 with password = 'empleadoadministracion'
 
-use AgainDB
+use COM1353G05
 go
 
 CREATE USER SupervisorRRHHUser for login SupervisorRRHH

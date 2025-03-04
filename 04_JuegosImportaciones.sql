@@ -1,4 +1,3 @@
-
 /*
 rutas usadas para importar:
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\catalogo.csv'
@@ -8,7 +7,7 @@ rutas usadas para importar:
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
 */
 
-use AgainDB
+use COM1353G05
 go
 
 create table #catalogoTemporal(
@@ -242,22 +241,41 @@ update #catalogoTemporal
 set nombre = REPLACE(nombre,'+í','a')
 where nombre like '%+í%'
 go
---------------------------
+/*
+  Esta linea de codigo es necesaria para importar directamente el catalogo pasado a limpio
+  sin tener que crear una tabla en la base de datos
+*/
+insert into venta.CatalogoGeneral(nombreProducto,categoriaProducto,precio)
+select nombre, categoria,cast(precio as decimal(12,2)) from #catalogoTemporal
+--------------------------------------
+select*from #catalogoTemporal
+select*from venta.CatalogoGeneral
 
+--drop table #catalogoTemporal
+
+/*Este exec, es solo para ejecutar si tengo un nuevo archivo con el formato Catalogo que anteriormente 
+  se paso a limpio
+*/
 exec administracion.ImportarCatalogo 
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\catalogo.csv'
+---------------------------------
 
+
+---importa a catalogo general
 exec administracion.ImportarAccesoriosElectronicos
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Electronic accessories.csv'
-
+---importa a catalogo general
 exec administracion.ImportarProductoImportado
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Productos\Productos_importados(Listado de Productos).csv'
-
+---importa a catalogo general, son productos y lineas que no tienen precio por el formato del archivo
 exec administracion.ImportarLineaProducto
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Informacion_complementaria(Clasificacion productos).csv'
 
+
+---importa a transacciones
 exec venta.InsertarVenta 
 'C:\Users\ulaza\Documents\SQL Server Management Studio\BDATrabajoPractico\BDATrabajoPractico\ArchivosImportar\Ventas_registradas.csv'
 
 
 select*from venta.CatalogoGeneral
+select*from venta.Transacciones
